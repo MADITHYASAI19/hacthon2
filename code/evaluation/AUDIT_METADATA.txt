@@ -1,0 +1,70 @@
+AUDIT METADATA
+==============
+
+Audit Date:         2026-10-25T00:35:07+0530
+Auditor:            Antigravity (Claude Sonnet 4.6 Thinking)
+Tool:               antigravity
+Model:              claude-sonnet-4-6-thinking
+
+Repository:         c:\\users\\hp\\OneDrive\\Desktop\\hackerrank-main
+Git Branch:         unknown (not a git repository - no .git directory)
+Git Commit Hash:    unknown (not a git repository)
+Worktree:           main
+
+Python Version:     3.12.10
+Python Executable:  C:\\Users\\HP\\AppData\\Local\\Microsoft\\WindowsApps\\PythonSoftwareFoundation.Python.3.12_qbz5n2kfra8p0\\python.exe
+pytest Version:     8.3.3
+
+Dataset Row Counts:
+  deletion_requests.csv:        518 rows
+  sample_deletion_requests.csv: 32 rows
+  sample_output.csv:            32 rows
+  user_identities.csv:          850 rows
+  user_audit_log.csv:           306 rows
+  system_activity.csv:          4011 rows
+  deletion_rules.csv:           15 rows
+  evidence_files.csv:           94 rows
+  dataset/evidence/ files:      94 files
+
+Output Files:
+  output.csv (root):            518 rows
+  output_sample_pred.csv:       32 rows (pre-existing sample predictions)
+  output_sample.csv:            32 rows (gold sample answers)
+
+Commands Executed During Audit:
+  git log -1 --format="%H %D" 2>&1                                           -> FAIL (not a git repo)
+  git branch --show-current 2>&1                                              -> FAIL (not a git repo)
+  python --version                                                            -> 3.12.10
+  python -c "import pdfplumber; print('pdfplumber: OK')"                    -> OK
+  python -c "import PIL; print('Pillow: OK')"                               -> OK
+  python -c "import pytesseract; print('pytesseract: OK')"                  -> OK
+  python -m pytest code/tests/ -v                                            -> 11/11 PASS
+  python -m py_compile code/main.py code/state.py ...                       -> PASS
+  python -c "import code.main"                                               -> PASS
+  python code/main.py --help                                                 -> PASS (shows help)
+  python audit_check.py                                                      -> dataset checks run
+  python run_eval_summary.py                                                 -> 32-case evaluation
+  python validate_output.py                                                  -> 518-case validation
+  python -m code.evaluation.main --gold dataset/sample_output.csv --pred output.csv -> FAIL (case_01..32 missing from root output.csv; root output.csv covers case_33..550 only)
+  python -m code.evaluation.main --gold dataset/sample_output.csv --pred output_sample_pred.csv -> 32/32 status, no-diffs mode not supported; used run_eval_summary.py
+
+Important Environment Notes:
+  1. No .git directory found. Repository has no version control history.
+  2. The root output.csv covers cases case_33..case_550 (evaluation dataset).
+     Sample cases case_01..case_32 are in output_sample_pred.csv (separate file).
+     Evaluating the root output.csv against sample_output.csv yields 0/32 matches
+     because the root output.csv does not contain case_01..case_32.
+  3. Tesseract OCR binary presence not verified; pytesseract is installed but
+     Tesseract itself may require separate installation on Windows.
+  4. No API keys, credentials, or secrets found anywhere in the repository.
+  5. Temporary audit scripts written to repo root (NOT production code):
+     - audit_check.py
+     - run_eval_summary.py
+     - validate_output.py
+     - write_audit_reports.py (this script)
+
+Audit Reports Generated:
+  code/evaluation/PROJECT_AUDIT.md
+  code/evaluation/TEST_RESULTS.md
+  code/evaluation/COMPLETION_MATRIX.md
+  code/evaluation/AUDIT_METADATA.txt

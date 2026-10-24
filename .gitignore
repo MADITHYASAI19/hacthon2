@@ -1,0 +1,7 @@
+.env
+code/.cache/
+__pycache__/
+**/__pycache__/
+*.pyc
+code.zip
+code (2).zip
