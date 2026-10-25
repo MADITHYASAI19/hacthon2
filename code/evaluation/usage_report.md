@@ -1,6 +1,6 @@
 # Token Usage and Cost Analysis
 
-**Total Cases Audited:** 518
+**Total Cases Audited:** 32
 
 ## Summary by Model
 

@@ -30,6 +30,28 @@ repo_root=c:/Users/HP/OneDrive/Desktop/projects/hackerank-hackthon/hackerrank-or
 worktree=main
 parent_agent=none
 
+## [2026-10-25T08:10:00Z] Submission-requirements audit and cleanup
+
+User Prompt (verbatim, secrets redacted):
+Review the full repository against the Ghost Data Still Exists requirements and provide a clean repository with unwanted generated files removed.
+
+Agent Response Summary:
+Audited the repository, output contract, reports, archive contents, and documentation. The root output passed the contract validator with 518 data rows and the rebuilt archive has normalized paths and excludes dataset data; 21 tests passed. Removed clearly generated comparison CSVs and Python/test caches, then updated README packaging instructions to use the included reproducible Python zipfile packager; final acceptance of the recently requested OCR ownership fix remains unverified because its requested sample/full diff sequence was not completed.
+
+Actions:
+* Ran code/evaluation/validate_output.py output.csv and repository/archive inspections
+* Removed generated comparison CSVs, sample output, and cache directories
+* Rebuilt code.zip with build_zip.py and ran `python -m pytest code/tests -q`
+* Updated README.md packaging instructions
+
+Context:
+tool=Codex
+model=GPT-5
+branch=main
+repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
+worktree=main
+parent_agent=none
+
 ## [2026-10-25T02:07:05+05:30] Finalize submission artifacts
 
 User Prompt (verbatim, secrets redacted):

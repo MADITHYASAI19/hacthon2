@@ -89,10 +89,11 @@ The offline intent classifier is rule-based and supports the represented languag
 
 ## Package
 
-Run this exact command from a shell with `zip` available:
+Build the submission archive from the repository root with the included Python
+packager:
 
 ```bash
-zip -r code.zip README.md code -x "*/__pycache__/*" "*/.venv/*" "*/.cache/*" "*/.git/*"
+python build_zip.py
 ```
 
-The archive intentionally excludes `dataset/`, output artifacts, caches, credentials, and nested archives.
+The archive uses forward-slash paths and intentionally excludes `dataset/`, output artifacts, caches, credentials, and nested archives.
