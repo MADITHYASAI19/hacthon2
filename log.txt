@@ -381,3 +381,84 @@ repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
 worktree=main
 parent_agent=none
 
+## [2026-10-25T07:15:00Z] Task 1 Tesseract availability check
+
+User Prompt (verbatim, secrets redacted):
+Do only the requested verification, usage-report, and packaging tasks in order; stop if Tesseract is unavailable.
+
+Agent Response Summary:
+Ran the required `tesseract --version` command in PowerShell. The executable was not recognized, so per the explicit stop condition no media-enabled run, evaluation, report update, usage regeneration, or packaging task was run.
+
+Actions:
+* Ran `tesseract --version` (failed: executable not found on PATH)
+
+Context:
+tool=Codex
+model=GPT-5
+branch=main
+repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
+worktree=main
+parent_agent=none
+
+## [2026-10-25T07:35:00Z] Media verification resumed with explicit Tesseract PATH
+
+User Prompt (verbatim, secrets redacted):
+Add C:\Program Files\Tesseract-OCR to PATH in each command, confirm Tesseract, then continue Tasks 1 through 3.
+
+Agent Response Summary:
+Confirmed Tesseract 5.5.3 and English language data after explicitly adding its directory to PATH. Started the required media-enabled 518-case audit; its live diagnostics confirmed 4 PDFs and 11 images with text, both media flags enabled, Tesseract available, and no warnings. Completed and evaluated the media-off 32-case sample run; the remaining media-on comparison, validation, usage, and packaging steps were not completed in this turn.
+
+Actions:
+* Ran `tesseract --version` and `tesseract --list-langs` with explicit PATH setup
+* Started media-enabled full audit and read its live diagnostics
+* Ran media-off sample audit and `python code/evaluation/main.py` against the public gold file
+
+Context:
+tool=Codex
+model=GPT-5
+branch=main
+repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
+worktree=main
+parent_agent=none
+
+## [2026-10-25T07:50:00Z] Verify media artifacts and rebuild submission archive
+
+User Prompt (verbatim, secrets redacted):
+Use existing completed media artifacts; update media documentation, requirements and environment template, build and verify code.zip, scan for credentials, and report checks.
+
+Agent Response Summary:
+Read the full-run diagnostics and usage report, confirming 518 offline cases, 4 PDFs and 11 images with text, Tesseract availability, and no diagnostics warnings. Updated documentation to identify media-on output.csv and supplied real sample metrics, then built a normalized zipfile archive and validated an extracted copy with 20 passing tests and a completed sample output. Credential-pattern scanning found only the intentional empty .env.example placeholder and source-code API-key identifiers, not credential values.
+
+Actions:
+* Ran validate_output.py, inspected diagnostics and usage report, and verified output header and 518 rows
+* Created code/requirements.txt, .env.example, build_zip.py, and updated .gitignore, README.md, and evaluation report
+* Built and inspected code.zip; extracted it with dataset and ran pytest plus a sample pipeline run
+* Scanned archive, output.csv, and log.txt for credential patterns without exposing values
+
+Context:
+tool=Codex
+model=GPT-5
+branch=main
+repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
+worktree=main
+parent_agent=none
+
+## [2026-10-25T07:20:00Z] Retry Task 1 Tesseract availability check
+
+User Prompt (verbatim, secrets redacted):
+Use tested optional-package versions and continue because Tesseract v5.5.3 is stated to be installed and on PATH.
+
+Agent Response Summary:
+Retried the mandatory PowerShell `tesseract --version` check before any other task. The executable is still not recognized in this session, which conflicts with the stated PATH configuration; per the stop condition no subsequent task was run.
+
+Actions:
+* Ran `tesseract --version` (failed: executable not found on PATH)
+
+Context:
+tool=Codex
+model=GPT-5
+branch=main
+repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
+worktree=main
+parent_agent=none
+

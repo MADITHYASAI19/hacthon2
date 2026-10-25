@@ -98,6 +98,22 @@ class MediaExtractionTests(unittest.TestCase):
         self.assertEqual([(r.file_id, r.resource_id) for r in first], [(r.file_id, r.resource_id) for r in second])
         self.assertEqual(len(first), len({(r.file_id, r.resource_id) for r in first}))
 
+    def test_ocr_table_rows_do_not_cross_anchor_owners(self):
+        from unittest.mock import MagicMock
+        image = self.root / "table.png"
+        image.write_bytes(b"placeholder")
+        text = "export_1260 ingrid.dahl@outlook.com Ready\nexport_1259 sara.kim@northstar.shop Packaging"
+        with patch.dict(os.environ, {"USE_IMAGE_OCR": "1", "USE_MEDIA_EVIDENCE": "0"}, clear=False), \
+             patch("code.extract.image_extract.shutil.which", return_value="tesseract"), \
+             patch("PIL.Image.open") as open_image, \
+             patch("pytesseract.image_to_string", return_value=text):
+            open_image.return_value.__enter__.return_value = MagicMock()
+            records = extract_image_evidence(image, "table", self.captured_at)
+        owners = {r.resource_id: r.identifiers["emails"] for r in records}
+        self.assertEqual(owners["export_1260"], ["ingrid.dahl@outlook.com"])
+        self.assertEqual(owners["export_1259"], ["sara.kim@northstar.shop"])
+        self.assertTrue(next(r for r in records if r.resource_id == "export_1260").metadata["ocr_row_identifiers_present"])
+
     def test_real_pdf_observation_requires_identity_anchor_and_respects_manifest_cutoff(self):
         """The production support attachment only enters case_07 after capture time."""
         dataset = load_dataset(Path("dataset"))

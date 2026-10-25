@@ -1,0 +1,15 @@
+{
+  "files_seen": {
+    "image": 11,
+    "pdf": 4
+  },
+  "files_with_text": {
+    "image": 0,
+    "pdf": 0
+  },
+  "ocr_enabled": false,
+  "pdf_enabled": false,
+  "pypdf_available": true,
+  "tesseract_available": true,
+  "warnings": []
+}

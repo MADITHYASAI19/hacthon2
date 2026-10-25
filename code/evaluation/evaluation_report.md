@@ -27,7 +27,7 @@ The public 32-row request set was rerun with `python code/main.py --requests dat
 | `state` | 156/197 | 79.19% |
 | `evidence_id` | 171/197 | 86.80% |
 
-## Optional local media extraction comparison (2026-10-25)
+## Local media extraction comparison and submitted configuration (2026-10-25)
 
 Both runs used the deterministic offline pipeline. The baseline explicitly set
 `USE_PDF_EVIDENCE=0` and `USE_IMAGE_OCR=0`; the comparison set both to `1`.
@@ -35,15 +35,14 @@ The baseline and media output were saved separately as
 `evaluation_baseline_sample.csv` and `evaluation_media_sample.csv`; the
 submission `output.csv` was not overwritten.
 
-| Metric | Baseline | PDF/OCR enabled | Change |
+| Metric | Media off | PDF on | PDF + OCR on (submitted) |
 |---|---:|---:|---:|
-| Status accuracy | 32/32 (100.00%) | 32/32 (100.00%) | 0 |
-| Exact rows | 14/32 (43.75%) | 14/32 (43.75%) | 0 |
-| Gold / predicted semantic steps | 193 / 180 | 193 / 183 | +3 predicted |
-| Exact-step precision | 160/180 (88.89%) | 163/183 (89.07%) | +0.18 pp |
-| Exact-step recall | 160/193 (82.90%) | 163/193 (84.46%) | +1.55 pp |
-| Exact-step F1 | 85.79% | 86.70% | +0.91 pp |
-| Sequence accuracy (micro LCS) | 82.90% | 84.46% | +1.55 pp |
+| Status accuracy | 32/32 (100.00%) | 32/32 (100.00%) | 32/32 (100.00%) |
+| Exact rows | 14/32 (43.75%) | 14/32 (43.75%) | 14/32 (43.75%) |
+| Exact-step precision | 160/180 (88.89%) | 163/183 (89.07%) | 163/183 (89.07%) |
+| Exact-step recall | 160/193 (82.90%) | 163/193 (84.46%) | 163/193 (84.46%) |
+
+The submitted root `output.csv` was generated with PDF and OCR extraction on. Full-run diagnostics recorded 4/4 PDFs and 11/11 images with text, `tesseract_available: true`, and no warnings. OCR did not change a public-sample result, but it did run on every manifest image.
 
 The enabled run extracted embedded text from all 4 PDFs. It discovered four
 resource IDs, but only `support_001` from `evidence_58` had a valid
@@ -54,11 +53,9 @@ synthetic document IDs or lacked an eligible identity anchor and therefore did
 not enter a case view. This is intentional: more extracted strings alone do
 not create findings.
 
-OCR was requested for 11 PNG files, but this environment has no `tesseract`
-executable on `PATH`; 11 structured `executable_missing` warnings were written
-to `media_sample_diagnostics.json`. No OCR text, OCR-derived IDs, or OCR-driven
-case changes were claimed. PDF/OCR diagnostics are structured JSON and retain
-the manifest file IDs and source filenames.
+OCR was requested for and ran on 11 PNG files. It made no public-sample change;
+PDF/OCR diagnostics are structured JSON and retain the manifest file IDs and
+source filenames.
 
 ## Per-case public-sample results
 

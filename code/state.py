@@ -172,6 +172,12 @@ def build_case_view(
                 if rec.category != "UNKNOWN":
                     res_to_category[res_id] = rec.category
         if res_id in candidate_res_ids and not is_synthetic_document_id:
+            # An OCR table row naming a different user is never evidence for
+            # this subject. Identifier-free rows remain usable only after an
+            # independent catalog/activity link anchors the resource.
+            if rec.source_table == "image_screenshot" and rec.metadata.get("ocr_row_identifiers_present"):
+                if not identity.matches(rec.identifiers) and not identity.matches(rec.user_ref):
+                    continue
             matching_records_by_res.setdefault(res_id, []).append(rec)
             if rec.system_id != "unknown_service":
                 res_to_system[res_id] = rec.system_id

@@ -46,11 +46,27 @@ def extract_image_evidence(
         diagnostics.files_with_text["image"] += 1
 
     # If OCR didn't find anything or isn't installed, extract filename-based record
-    res_matches = re.findall(r"\b(account_\d+|support_\d+|export_\d+|audit_record_\d+|search_\d+|analytics_\d+|tombstone_\d+)\b", text_content)
-    emails = re.findall(r"[\w\.-]+@[\w\.-]+", text_content)
-    user_ids = re.findall(r"\buser_\d+\b", text_content)
+    resource_re = re.compile(r"\b(account|support|export|audit_record|search|analytics|tombstone)[_\s]+(\d+)\b", re.IGNORECASE)
+    emails = re.compile(r"[\w\.-]+@[\w\.-]+").findall(text_content)
+    user_ids = re.compile(r"\buser_\d+\b").findall(text_content)
 
-    found_resources = set(res_matches)
+    # OCR tables are multi-subject views.  A resource is an ownership candidate
+    # only when an exact identifier appears on its own OCR line, never merely in
+    # a header, detail pane, or neighboring row.
+    resource_rows = {}
+    if ocr_used:
+        for line in text_content.splitlines():
+            line_resources = resource_re.findall(line)
+            if not line_resources:
+                continue
+            row_ids = {
+                "emails": re.compile(r"[\w\.-]+@[\w\.-]+").findall(line),
+                "user_ids": re.compile(r"\buser_\d+\b").findall(line),
+            }
+            for prefix, number in line_resources:
+                resource_rows[f"{prefix.lower()}_{number}"] = (line, row_ids)
+
+    found_resources = set(resource_rows) if ocr_used else set()
     if not found_resources:
         # Check stem
         stem_m = re.findall(r"\b(account_\d+|support_\d+|export_\d+|audit_record_\d+|search_\d+|analytics_\d+|tombstone_\d+)\b", file_path.stem)
@@ -68,6 +84,7 @@ def extract_image_evidence(
                 cat = PREFIX_TO_CATEGORY.get(p, "UNKNOWN")
                 break
 
+        row_text, row_identifiers = resource_rows.get(res_id, (text_content, {"emails": emails, "user_ids": user_ids}))
         records.append(
             ExtractedRecord(
                 file_id=file_id,
@@ -75,12 +92,12 @@ def extract_image_evidence(
                 system_id=sys_id,
                 resource_id=res_id,
                 category=cat,
-                user_ref=";".join(user_ids),
-                identifiers={"emails": emails, "user_ids": user_ids, "ocr_text": text_content[:500]},
+                user_ref=";".join(row_identifiers["user_ids"]),
+                identifiers={"emails": row_identifiers["emails"], "user_ids": row_identifiers["user_ids"], "ocr_text": row_text[:500]},
                 state_hint="PRESENT",
-                raw=text_content[:2000],
+                raw=row_text[:2000],
                 source_table="image_screenshot",
-                metadata={"source_filename": file_path.name, "engine": "tesseract" if ocr_used else "filename_fallback", "ocr_used": ocr_used},
+                metadata={"source_filename": file_path.name, "engine": "tesseract" if ocr_used else "filename_fallback", "ocr_used": ocr_used, "ocr_row_identifiers_present": bool(row_identifiers["emails"] or row_identifiers["user_ids"])},
             )
         )
 
