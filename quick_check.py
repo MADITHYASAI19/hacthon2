@@ -25,16 +25,19 @@ text = open("dataset/system_activity.csv", encoding="utf-8", errors="ignore").re
 for f in glob.glob("dataset/evidence/**/*", recursive=True):
     if f.endswith((".json", ".log", ".txt", ".sql")):
         text += open(f, encoding="utf-8", errors="ignore").read()
-if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
+def media_enabled(name):
+    return os.environ.get(name, os.environ.get("USE_MEDIA_EVIDENCE", "0")) == "1"
+
+if media_enabled("USE_PDF_EVIDENCE") or media_enabled("USE_IMAGE_OCR"):
     from code.extract.doc_extract import extract_doc_evidence
     from code.extract.image_extract import extract_image_evidence
     from code.loader import parse_ts
 
     for evidence in csv.DictReader(open("dataset/evidence_files.csv", encoding="utf-8", newline="")):
         path = Path(evidence["file_path"])
-        if path.suffix.lower() == ".pdf":
+        if path.suffix.lower() == ".pdf" and media_enabled("USE_PDF_EVIDENCE"):
             records = extract_doc_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
-        elif path.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+        elif path.suffix.lower() in {".png", ".jpg", ".jpeg"} and media_enabled("USE_IMAGE_OCR"):
             records = extract_image_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
         else:
             continue

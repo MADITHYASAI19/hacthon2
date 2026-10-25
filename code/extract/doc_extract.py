@@ -2,42 +2,67 @@
 from __future__ import annotations
 
 import re
-import os
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 
 from code.extract.schema import ExtractedRecord
+from code.extract.media_config import ExtractionDiagnostics, enabled
 from code.extract.sql_extract import PREFIX_TO_CATEGORY, PREFIX_TO_SYSTEM
 from code.loader import parse_ts
 
-# Media extraction is deliberately opt-in.  PDF parser availability differs by
-# machine, so the default path must behave like an installation without pypdf.
-if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
+def extract_doc_evidence(
+    file_path: Path,
+    file_id: str,
+    default_captured_at: Optional[datetime],
+    diagnostics: Optional[ExtractionDiagnostics] = None,
+) -> List[ExtractedRecord]:
+    """Extract text from every readable PDF page when explicitly enabled."""
+    records = []
+    if diagnostics:
+        diagnostics.files_seen["pdf"] += 1
+    if not enabled("USE_PDF_EVIDENCE"):
+        return records
     try:
         import pypdf
     except ImportError:
-        pypdf = None
-else:
-    pypdf = None
+        if diagnostics:
+            diagnostics.warn(file_id, file_path, "pypdf", "dependency_missing", "Install with: python -m pip install pypdf")
+        return records
 
+    text_pages = []
+    try:
+        reader = pypdf.PdfReader(str(file_path))
+        if reader.is_encrypted:
+            try:
+                if not reader.decrypt(""):
+                    raise ValueError("encrypted PDF cannot be opened without a password")
+            except Exception as exc:
+                if diagnostics:
+                    diagnostics.warn(file_id, file_path, "pypdf", "encrypted_pdf", str(exc))
+                return records
+        for page_no, page in enumerate(reader.pages, 1):
+            try:
+                text = page.extract_text() or ""
+            except Exception as exc:
+                if diagnostics:
+                    diagnostics.warn(file_id, file_path, "pypdf", "page_extract_failed", f"page {page_no}: {exc}")
+                continue
+            if text.strip():
+                text_pages.append((page_no, text))
+    except Exception as exc:
+        if diagnostics:
+            diagnostics.warn(file_id, file_path, "pypdf", "pdf_read_failed", str(exc))
+        return records
 
-def extract_doc_evidence(file_path: Path, file_id: str, default_captured_at: Optional[datetime]) -> List[ExtractedRecord]:
-    """Extract text from PDF documents using pypdf."""
-    records = []
-    text_content = ""
-    if pypdf:
-        try:
-            reader = pypdf.PdfReader(str(file_path))
-            for page in reader.pages:
-                t = page.extract_text()
-                if t:
-                    text_content += t + "\n"
-        except Exception:
-            pass
+    text_content = "\n".join(text for _, text in text_pages)
 
     if not text_content:
+        if diagnostics:
+            diagnostics.warn(file_id, file_path, "pypdf", "scanned_or_empty_pdf", "No embedded text; local PDF OCR is not configured.")
         return records
+    if diagnostics:
+        diagnostics.files_with_text["pdf"] += 1
 
     # Look for identifiers and resource references
     res_matches = re.findall(r"\b(account_\d+|support_\d+|export_\d+|audit_record_\d+|object_\d+)\b", text_content)
@@ -77,6 +102,7 @@ def extract_doc_evidence(file_path: Path, file_id: str, default_captured_at: Opt
                 state_hint="PRESENT",
                 raw=text_content[:2000],
                 source_table="pdf_document",
+                metadata={"source_filename": file_path.name, "page_numbers": [page for page, _ in text_pages], "engine": "pypdf"},
             )
         )
 

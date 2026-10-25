@@ -15,6 +15,7 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from code.extract.registry import load_all_evidence
+from code.extract.media_config import ExtractionDiagnostics
 from code.identity import resolve_identity
 from code.intent import classify_all_requests_hybrid, classify_intent_offline
 from code.loader import load_dataset, parse_ts
@@ -29,14 +30,23 @@ def run_audit(
     output_path: Path,
     dataset_dir: Path,
     usage_report_path: Optional[Path] = None,
+    media_diagnostics_path: Optional[Path] = None,
     use_llm: bool = False,
 ):
     print(f"Loading dataset from {dataset_dir}...")
     dataset = load_dataset(dataset_dir)
 
     print("Extracting evidence from all evidence files...")
-    all_records = load_all_evidence(dataset, base_dir=dataset_dir.parent)
+    extraction_diagnostics = ExtractionDiagnostics()
+    all_records = load_all_evidence(dataset, base_dir=dataset_dir.parent, diagnostics=extraction_diagnostics)
     print(f"Loaded {len(all_records)} evidence records.")
+    print("Media extraction diagnostics: " + json.dumps(extraction_diagnostics.summary(), sort_keys=True))
+    if media_diagnostics_path:
+        media_diagnostics_path.parent.mkdir(parents=True, exist_ok=True)
+        media_diagnostics_path.write_text(
+            json.dumps(extraction_diagnostics.summary(), indent=2, sort_keys=True) + "\n",
+            encoding="utf-8",
+        )
 
     # Read requests from target path
     with open(requests_path, "r", encoding="utf-8", newline="") as f:
@@ -286,6 +296,7 @@ def main():
     parser.add_argument("--out", type=Path, default=ROOT / "output.csv")
     parser.add_argument("--dataset", type=Path, default=ROOT / "dataset")
     parser.add_argument("--usage-report", type=Path, default=ROOT / "code" / "evaluation" / "usage_report.md")
+    parser.add_argument("--media-diagnostics", type=Path, help="Write structured local PDF/OCR extraction diagnostics as JSON.")
     parser.add_argument("--use-llm", action="store_true", help="Enable optional Grok intent classification.")
     parser.add_argument("--offline", action="store_true", help="Force deterministic offline intent classification.")
     parser.add_argument("--check-llm", action="store_true", help="Make one safe Grok connectivity check and exit.")
@@ -305,6 +316,7 @@ def main():
         output_path=args.out,
         dataset_dir=args.dataset,
         usage_report_path=args.usage_report,
+        media_diagnostics_path=args.media_diagnostics,
         use_llm=use_llm,
     )
 

@@ -360,3 +360,24 @@ repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
 worktree=main
 parent_agent=none
 
+## [2026-10-25T07:05:00Z] Enable local PDF and OCR evidence extraction
+
+User Prompt (verbatim, secrets redacted):
+Continue the pasted task to enable and evaluate local PDF/OCR evidence extraction.
+
+Agent Response Summary:
+Implemented independent opt-in PDF and OCR controls while retaining the deterministic flag-off baseline and existing identity, state, policy, and planner interfaces. PDF extraction ran locally through pypdf and improved sample semantic-step metrics; local OCR was correctly blocked because no Tesseract executable exists on PATH, with structured diagnostics and installation guidance written instead of fabricated text. The full media-enabled run was isolated from output.csv but did not complete in this environment and was terminated; baseline validation and all expanded unit tests passed.
+
+Actions:
+* Edited media extractors, registry, schema, main entry point, validators, README, evaluation reports, and media extraction tests
+* Ran baseline and enabled sample runs, 20 unit tests, quick_check.py, and validate_output.py
+* Recorded pypdf extraction and Tesseract executable availability in code/evaluation/media_sample_diagnostics.json
+
+Context:
+tool=Codex
+model=GPT-5
+branch=main
+repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
+worktree=main
+parent_agent=none
+

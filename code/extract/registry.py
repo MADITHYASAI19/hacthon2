@@ -8,13 +8,18 @@ from code.extract.doc_extract import extract_doc_evidence
 from code.extract.image_extract import extract_image_evidence
 from code.extract.json_extract import extract_json_evidence
 from code.extract.log_extract import extract_log_evidence
+from code.extract.media_config import ExtractionDiagnostics
 from code.extract.schema import ExtractedRecord
 from code.extract.sql_extract import extract_sql_evidence
 from code.extract.txt_extract import extract_txt_evidence
 from code.loader import Dataset, parse_ts
 
 
-def load_all_evidence(dataset: Dataset, base_dir: Optional[Path] = None) -> List[ExtractedRecord]:
+def load_all_evidence(
+    dataset: Dataset,
+    base_dir: Optional[Path] = None,
+    diagnostics: Optional[ExtractionDiagnostics] = None,
+) -> List[ExtractedRecord]:
     """Iterate over all rows in evidence_files.csv and extract records."""
     if base_dir is None:
         base_dir = Path(__file__).resolve().parent.parent.parent
@@ -45,9 +50,9 @@ def load_all_evidence(dataset: Dataset, base_dir: Optional[Path] = None) -> List
         elif ext == ".txt":
             records = extract_txt_evidence(full_path, file_id, cap_time)
         elif ext == ".pdf":
-            records = extract_doc_evidence(full_path, file_id, cap_time)
+            records = extract_doc_evidence(full_path, file_id, cap_time, diagnostics)
         elif ext in (".png", ".jpg", ".jpeg"):
-            records = extract_image_evidence(full_path, file_id, cap_time)
+            records = extract_image_evidence(full_path, file_id, cap_time, diagnostics)
         else:
             continue
 

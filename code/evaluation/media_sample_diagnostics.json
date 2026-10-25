@@ -1,0 +1,93 @@
+{
+  "files_seen": {
+    "image": 11,
+    "pdf": 4
+  },
+  "files_with_text": {
+    "image": 0,
+    "pdf": 4
+  },
+  "ocr_enabled": true,
+  "pdf_enabled": true,
+  "pypdf_available": true,
+  "tesseract_available": false,
+  "warnings": [
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_04",
+      "filename": "account_admin_console_20260926.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_09",
+      "filename": "search_index_inspector_20260901.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_14",
+      "filename": "connector_management_console_20260807.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_19",
+      "filename": "analytics_profile_view_20260713.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_23",
+      "filename": "customer_export_console_20260618.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_28",
+      "filename": "support_ticket_console_20260524.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_32",
+      "filename": "backup_restore_console_20260429.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_37",
+      "filename": "security_audit_explorer_20260905.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_42",
+      "filename": "deleted_account_reference_20260310.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_46",
+      "filename": "object_storage_browser_20260213.png"
+    },
+    {
+      "code": "executable_missing",
+      "detail": "Install Tesseract OCR, add tesseract to PATH, then run: tesseract --list-langs.",
+      "engine": "tesseract",
+      "file_id": "evidence_60",
+      "filename": "marketing_profile_console.png"
+    }
+  ]
+}

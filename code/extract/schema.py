@@ -19,3 +19,4 @@ class ExtractedRecord:
     state_hint: str = "UNKNOWN"
     raw: Any = None
     source_table: str = ""
+    metadata: Dict[str, Any] = field(default_factory=dict)

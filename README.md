@@ -28,7 +28,9 @@ intent classification -> evidence extraction -> state at audit_at
 
 Environment variables are not required for an offline run. Optional Grok intent classification uses `XAI_API_KEY` and `GROK_MODEL`; copy `.env.example` to a local, uncommitted `.env` and replace its placeholders. `.env` and the Grok cache are ignored by Git. Only intent classification can use Grok; all evidence, identity, state, policy, and planning work is deterministic code.
 
-`USE_MEDIA_EVIDENCE` is off by default. Set `USE_MEDIA_EVIDENCE=1` only to opt into PDF text extraction (`pypdf`) and screenshot OCR (`Pillow` + `pytesseract`) when those optional dependencies are installed. Leaving it unset (or any value other than `1`) skips media text extraction exactly as if those libraries were unavailable, ensuring identical default output across machines. The submitted `output.csv` was generated with this flag off.
+Media evidence is opt-in. `USE_PDF_EVIDENCE=1` enables embedded-text PDF extraction with `pypdf`; `USE_IMAGE_OCR=1` enables local PNG/JPEG OCR with Pillow, `pytesseract`, and the Tesseract executable. `USE_MEDIA_EVIDENCE=1` remains a backwards-compatible shortcut that enables both unless an individual setting overrides it. Leaving all flags unset (or setting them to values other than `1`) retains the deterministic baseline: PDFs produce no observations and images use only their existing filename fallback. The submitted `output.csv` was generated with media extraction off.
+
+Install the optional local dependencies with `python -m pip install pypdf pillow pytesseract`. OCR additionally requires the Tesseract executable and language data installed locally and visible on `PATH` (`tesseract --list-langs`). No evidence is ever sent to an external service. If an enabled dependency is missing or a file cannot be read, the run reports a structured warning and can write it to JSON with `--media-diagnostics`.
 
 ## Run
 
@@ -41,8 +43,13 @@ python code/main.py
 # Force a deterministic offline run
 python code/main.py --offline
 
-# Optional: enable PDF/OCR evidence extraction for an exploratory run
-USE_MEDIA_EVIDENCE=1 python code/main.py --offline
+# Optional, independently enabled local extraction (PowerShell)
+$env:USE_PDF_EVIDENCE="1"; $env:USE_IMAGE_OCR="1"
+python code/main.py --offline --out media_output.csv --media-diagnostics code/evaluation/media_diagnostics.json
+
+# Deterministic baseline, explicitly disabling both extractors
+$env:USE_PDF_EVIDENCE="0"; $env:USE_IMAGE_OCR="0"
+python code/main.py --offline --out baseline_output.csv
 
 # Force optional Grok use for intent classification (falls back offline on API errors)
 python code/main.py --use-llm

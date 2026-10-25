@@ -87,7 +87,10 @@ for evidence_path in evidence_root.rglob("*"):
 # extraction route as the audit so IDs read from PDFs/screenshots are grounded.
 # With the default flag-off setting, this intentionally matches a machine where
 # pypdf/Pillow/pytesseract are unavailable.
-if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
+def media_enabled(name: str) -> bool:
+    return os.environ.get(name, os.environ.get("USE_MEDIA_EVIDENCE", "0")) == "1"
+
+if media_enabled("USE_PDF_EVIDENCE") or media_enabled("USE_IMAGE_OCR"):
     from code.extract.doc_extract import extract_doc_evidence
     from code.extract.image_extract import extract_image_evidence
     from code.loader import parse_ts
@@ -96,9 +99,9 @@ if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
         path = ROOT / evidence["file_path"]
         if not path.exists():
             continue
-        if path.suffix.lower() == ".pdf":
+        if path.suffix.lower() == ".pdf" and media_enabled("USE_PDF_EVIDENCE"):
             records = extract_doc_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
-        elif path.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+        elif path.suffix.lower() in {".png", ".jpg", ".jpeg"} and media_enabled("USE_IMAGE_OCR"):
             records = extract_image_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
         else:
             continue
