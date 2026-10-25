@@ -28,6 +28,8 @@ intent classification -> evidence extraction -> state at audit_at
 
 Environment variables are not required for an offline run. Optional Grok intent classification uses `XAI_API_KEY` and `GROK_MODEL`; copy `.env.example` to a local, uncommitted `.env` and replace its placeholders. `.env` and the Grok cache are ignored by Git. Only intent classification can use Grok; all evidence, identity, state, policy, and planning work is deterministic code.
 
+`USE_MEDIA_EVIDENCE` is off by default. Set `USE_MEDIA_EVIDENCE=1` only to opt into PDF text extraction (`pypdf`) and screenshot OCR (`Pillow` + `pytesseract`) when those optional dependencies are installed. Leaving it unset (or any value other than `1`) skips media text extraction exactly as if those libraries were unavailable, ensuring identical default output across machines. The submitted `output.csv` was generated with this flag off.
+
 ## Run
 
 From the repository root:
@@ -38,6 +40,9 @@ python code/main.py
 
 # Force a deterministic offline run
 python code/main.py --offline
+
+# Optional: enable PDF/OCR evidence extraction for an exploratory run
+USE_MEDIA_EVIDENCE=1 python code/main.py --offline
 
 # Force optional Grok use for intent classification (falls back offline on API errors)
 python code/main.py --use-llm

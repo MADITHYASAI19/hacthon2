@@ -324,3 +324,39 @@ branch=unknown (not a git repository)
 repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
 worktree=main
 parent_agent=none
+## [2026-10-25T05:15:40.7568733Z] SESSION START
+
+tool=Codex
+model=GPT-5
+Repo Root: C:\Users\HP\OneDrive\Desktop\hackerrank-main
+Branch: main
+Worktree: main
+Parent Agent: none
+Language: py
+Time Remaining: not configured
+
+## [2026-10-25T05:23:17.6501654Z] Deterministic media evidence and submission package
+
+User Prompt (verbatim, secrets redacted):
+Make the output identical on every machine. Do not change identity/state/policy/planner logic.
+1. Add an environment flag USE_MEDIA_EVIDENCE (default off). In code/extract/doc_extract.py and image_extract.py, only use pypdf / pytesseract when it is set to "1"; otherwise skip PDF/PNG text extraction exactly as when the libraries are not installed.
+2. Make validate_output.py and quick_check.py treat resource ids found in PDF/PNG evidence as grounded, or run them with the flag off.
+3. README: document the flag, and state that the submitted output.csv was generated with it off.
+4. Regenerate output.csv with the flag off, then run: unit tests, sample run + quick_check.py (FABRICATION 0), full run, validate_output.py (exit 0). Report case_45 specifically.
+5. Delete __pycache__ and code/.cache, then build code.zip from the repo root with README.md at its root.
+Agent Response Summary:
+Added an opt-in USE_MEDIA_EVIDENCE gate for PDF and OCR extraction; the default path now behaves as though optional media libraries are unavailable, without changing identity, state, policy, or planner logic. Regenerated and validated the flag-off output: unit tests passed, the sample check reported FABRICATION 0, and the full validator passed all 18 checks. Removed requested cache directories and built code.zip with README.md at its archive root.
+
+Actions:
+* Edited code/extract/doc_extract.py, code/extract/image_extract.py, validate_output.py, quick_check.py, and README.md
+* Ran unit tests, flag-off sample/full audits, quick_check.py, and validate_output.py
+* Removed code/.cache and __pycache__ directories; built and inspected code.zip
+
+Context:
+tool=Codex
+model=GPT-5
+branch=main
+repo_root=C:\Users\HP\OneDrive\Desktop\hackerrank-main
+worktree=main
+parent_agent=none
+

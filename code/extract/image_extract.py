@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
@@ -9,10 +10,16 @@ from typing import List, Optional
 from code.extract.schema import ExtractedRecord
 from code.extract.sql_extract import PREFIX_TO_CATEGORY, PREFIX_TO_SYSTEM
 
-try:
-    from PIL import Image
-    import pytesseract
-except ImportError:
+# OCR is opt-in for reproducible default output.  With the flag absent this
+# retains the existing no-library behavior, including filename-based records.
+if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
+    try:
+        from PIL import Image
+        import pytesseract
+    except ImportError:
+        Image = None
+        pytesseract = None
+else:
     Image = None
     pytesseract = None
 

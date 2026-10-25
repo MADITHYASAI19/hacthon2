@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import csv
 import json
+import os
 import sys
 from pathlib import Path
 from typing import Dict, List, Set, Tuple
@@ -81,6 +82,27 @@ evidence_root = ROOT / "dataset" / "evidence"
 for evidence_path in evidence_root.rglob("*"):
     if evidence_path.is_file():
         known_resource_text += evidence_path.read_bytes().decode("utf-8", errors="ignore")
+
+# When optional media extraction is enabled, use the same participant-visible
+# extraction route as the audit so IDs read from PDFs/screenshots are grounded.
+# With the default flag-off setting, this intentionally matches a machine where
+# pypdf/Pillow/pytesseract are unavailable.
+if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
+    from code.extract.doc_extract import extract_doc_evidence
+    from code.extract.image_extract import extract_image_evidence
+    from code.loader import parse_ts
+
+    for evidence in csv.DictReader((ROOT / "dataset" / "evidence_files.csv").open(encoding="utf-8")):
+        path = ROOT / evidence["file_path"]
+        if not path.exists():
+            continue
+        if path.suffix.lower() == ".pdf":
+            records = extract_doc_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
+        elif path.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+            records = extract_image_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
+        else:
+            continue
+        known_resource_text += "\n".join(record.resource_id for record in records)
 
 # Invariant tracking
 bad_json = []

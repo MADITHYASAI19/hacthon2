@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+import os
 from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
@@ -10,9 +11,14 @@ from code.extract.schema import ExtractedRecord
 from code.extract.sql_extract import PREFIX_TO_CATEGORY, PREFIX_TO_SYSTEM
 from code.loader import parse_ts
 
-try:
-    import pypdf
-except ImportError:
+# Media extraction is deliberately opt-in.  PDF parser availability differs by
+# machine, so the default path must behave like an installation without pypdf.
+if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
+    try:
+        import pypdf
+    except ImportError:
+        pypdf = None
+else:
     pypdf = None
 
 

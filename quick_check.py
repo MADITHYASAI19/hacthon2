@@ -1,4 +1,4 @@
-import csv, json, glob, subprocess, sys
+import csv, json, glob, os, subprocess, sys
 from pathlib import Path
 
 def rows(p):
@@ -25,6 +25,20 @@ text = open("dataset/system_activity.csv", encoding="utf-8", errors="ignore").re
 for f in glob.glob("dataset/evidence/**/*", recursive=True):
     if f.endswith((".json", ".log", ".txt", ".sql")):
         text += open(f, encoding="utf-8", errors="ignore").read()
+if os.environ.get("USE_MEDIA_EVIDENCE") == "1":
+    from code.extract.doc_extract import extract_doc_evidence
+    from code.extract.image_extract import extract_image_evidence
+    from code.loader import parse_ts
+
+    for evidence in csv.DictReader(open("dataset/evidence_files.csv", encoding="utf-8", newline="")):
+        path = Path(evidence["file_path"])
+        if path.suffix.lower() == ".pdf":
+            records = extract_doc_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
+        elif path.suffix.lower() in {".png", ".jpg", ".jpeg"}:
+            records = extract_image_evidence(path, evidence["file_id"], parse_ts(evidence.get("captured_at", "")))
+        else:
+            continue
+        text += "\n".join(record.resource_id for record in records)
 bad = set()
 for r in rows("output.csv").values():
     for s in json.loads(r["steps_json"]):
